@@ -1,0 +1,22 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/fragment_file_viewer"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="net.pubnative.easysound.fragments.FileViewerFragment">
+
+    <com.mopub.mobileads.MoPubView
+        android:id="@+id/banner_container"
+        android:layout_width="320dp"
+        android:layout_height="50dp"
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentBottom="true"
+        android:visibility="gone"/>
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/recyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@id/banner_container"/>
+
+</RelativeLayout>
