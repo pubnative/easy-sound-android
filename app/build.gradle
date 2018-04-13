@@ -9,8 +9,8 @@ android {
         applicationId "net.pubnative.easysound"
         minSdkVersion 16
         targetSdkVersion 27
-        versionCode 101
-        versionName "0.1.1"
+        versionCode 102
+        versionName "0.1.2"
     }
     buildTypes {
         release {
@@ -31,8 +31,8 @@ dependencies {
     implementation('com.mopub:mopub-sdk:4.20.0@aar') {
         transitive = true
     }
-    implementation 'net.pubnative:lite.sdk:0.1.7-master.111'
-    implementation 'net.pubnative:lite.adapters.mopub:0.1.7-master.111'
+    implementation 'net.pubnative:lite.sdk:0.1.7-master.113'
+    implementation 'net.pubnative:lite.adapters.mopub:0.1.7-master.113'
 }
 
 apply plugin: 'com.google.gms.google-services'
