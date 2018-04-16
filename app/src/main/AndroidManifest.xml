@@ -28,12 +28,7 @@
             android:name=".activities.SettingsActivity"
             android:screenOrientation="portrait"
             android:label="@string/action_settings"
-            android:theme="@style/AppTheme.NoActionBar"
-            android:parentActivityName=".activities.MainActivity">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="net.pubnative.easysound.activities.MainActivity" />
-        </activity>
+            android:theme="@style/AppTheme.NoActionBar"/>
 
         <activity
             android:name="com.mopub.mobileads.MoPubActivity"
