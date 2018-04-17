@@ -67,6 +67,7 @@ public class FileViewerFragment extends Fragment implements MoPubView.BannerAdLi
         mRecyclerView.setAdapter(mFileViewerAdapter);
 
         mBannerView = v.findViewById(R.id.banner_container);
+        mBannerView.setAutorefreshEnabled(false);
 
         return v;
     }
