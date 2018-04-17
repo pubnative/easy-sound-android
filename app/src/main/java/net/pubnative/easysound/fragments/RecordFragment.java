@@ -216,15 +216,15 @@ public class RecordFragment extends Fragment implements MoPubInterstitial.Inters
     }
 
     private void loadInterstitial() {
-        mInterstitial = new MoPubInterstitial(getActivity(), "b433eb5298524151b2a5040dde9ba956");
+        mInterstitial = new MoPubInterstitial(getActivity(), getString(R.string.mopub_interstitial_ad_unit_id));
         mInterstitial.setInterstitialAdListener(this);
         RequestManager requestManager = new InterstitialRequestManager();
-        requestManager.setZoneId("3");
+        requestManager.setZoneId(getString(R.string.pnlite_interstitial_zone_id));
         requestManager.setRequestListener(new RequestManager.RequestListener() {
             @Override
             public void onRequestSuccess(Ad ad) {
                 if (getContext() != null && isResumed()) {
-                    mInterstitial.setKeywords(PrebidUtils.getPrebidKeywords(ad, "3"));
+                    mInterstitial.setKeywords(PrebidUtils.getPrebidKeywords(ad, getString(R.string.pnlite_interstitial_zone_id)));
                     mInterstitial.load();
                 }
             }

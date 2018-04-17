@@ -92,13 +92,13 @@ public class FileViewerFragment extends Fragment implements MoPubView.BannerAdLi
 
     public void loadAd() {
         RequestManager requestManager = new BannerRequestManager();
-        requestManager.setZoneId("2");
+        requestManager.setZoneId(getString(R.string.pnlite_banner_zone_id));
         requestManager.setRequestListener(new RequestManager.RequestListener() {
             @Override
             public void onRequestSuccess(Ad ad) {
                 if (getContext() != null && isResumed()) {
-                    mBannerView.setAdUnitId("e7647b345b4646d3b07d57b4366386b4");
-                    mBannerView.setKeywords(PrebidUtils.getPrebidKeywords(ad, "2"));
+                    mBannerView.setAdUnitId(getString(R.string.mopub_banner_ad_unit_id));
+                    mBannerView.setKeywords(PrebidUtils.getPrebidKeywords(ad, getString(R.string.pnlite_banner_zone_id)));
                     mBannerView.loadAd();
                 }
             }
@@ -106,7 +106,7 @@ public class FileViewerFragment extends Fragment implements MoPubView.BannerAdLi
             @Override
             public void onRequestFail(Throwable throwable) {
                 if (getContext() != null && isResumed()) {
-                    mBannerView.setAdUnitId("e7647b345b4646d3b07d57b4366386b4");
+                    mBannerView.setAdUnitId(getString(R.string.mopub_banner_ad_unit_id));
                     mBannerView.loadAd();
                 }
                 Log.e(LOG_TAG, throwable.getMessage());
