@@ -182,6 +182,12 @@ public class RecordFragment extends Fragment implements MoPubInterstitial.Inters
         }
     }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        mInterstitial.destroy();
+    }
+
     private void disableRecordButtonWithTimeout() {
         if (getView() != null) {
             mRecordButton.setEnabled(false);

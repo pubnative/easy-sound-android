@@ -90,6 +90,12 @@ public class FileViewerFragment extends Fragment implements MoPubView.BannerAdLi
         super.onPause();
     }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        mBannerView.destroy();
+    }
+
     public void loadAd() {
         RequestManager requestManager = new BannerRequestManager();
         requestManager.setZoneId(getString(R.string.pnlite_banner_zone_id));
