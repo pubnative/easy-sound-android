@@ -3,7 +3,7 @@ apply plugin: 'io.fabric'
 
 android {
     compileSdkVersion 28
-    buildToolsVersion '28.0.2'
+    buildToolsVersion '28.0.3'
 
     defaultConfig {
         applicationId "net.pubnative.easysound"
@@ -11,6 +11,7 @@ android {
         targetSdkVersion 28
         versionCode 200
         versionName "0.2.0"
+        testInstrumentationRunner = 'android.support.test.runner.AndroidJUnitRunner'
     }
     buildTypes {
         release {
@@ -25,14 +26,16 @@ dependencies {
     implementation 'com.google.android.material:material:1.0.0'
     implementation 'androidx.cardview:cardview:1.0.0'
 
-    implementation 'com.google.firebase:firebase-core:16.0.3'
+    implementation 'com.google.firebase:firebase-core:16.0.4'
     implementation 'com.crashlytics.sdk.android:crashlytics:2.9.5'
 
-    implementation('com.mopub:mopub-sdk:5.3.0@aar') {
+    implementation('com.mopub:mopub-sdk:5.4.0@aar') {
         transitive = true
     }
-    implementation 'net.pubnative:hybid.sdk:0.2.6'
-    implementation 'net.pubnative:hybid.adapters.mopub:0.2.6'
+    implementation 'net.pubnative:hybid.sdk:0.3.0-development.372'
+    implementation 'net.pubnative:hybid.adapters.mopub:0.3.0-development.372'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.0-beta01'
+    androidTestImplementation 'androidx.test:rules:1.1.0-beta01'
 }
 
 apply plugin: 'com.google.gms.google-services'
