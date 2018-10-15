@@ -32,8 +32,8 @@ dependencies {
     implementation('com.mopub:mopub-sdk:5.4.0@aar') {
         transitive = true
     }
-    implementation 'net.pubnative:hybid.sdk:0.3.0-development.372'
-    implementation 'net.pubnative:hybid.adapters.mopub:0.3.0-development.372'
+    implementation 'net.pubnative:hybid.sdk:0.3.0'
+    implementation 'net.pubnative:hybid.adapters.mopub:0.3.0'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.0-beta01'
     androidTestImplementation 'androidx.test:rules:1.1.0-beta01'
 }

@@ -1,10 +1,13 @@
 package net.pubnative.easysound.activities;
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
@@ -14,15 +17,24 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.viewpager.widget.ViewPager;
 
+import android.os.Handler;
+import android.os.Looper;
+import android.preference.PreferenceManager;
 import android.view.Menu;
 import android.view.MenuItem;
 
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.tabs.TabLayout;
+import com.mopub.common.MoPub;
+import com.mopub.common.privacy.ConsentDialogListener;
+import com.mopub.common.privacy.PersonalInfoManager;
+import com.mopub.mobileads.MoPubErrorCode;
 
 import net.pubnative.easysound.R;
 import net.pubnative.easysound.fragments.FileViewerFragment;
 import net.pubnative.easysound.fragments.RecordFragment;
+import net.pubnative.lite.sdk.HyBid;
+import net.pubnative.lite.sdk.consent.UserConsentActivity;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -30,6 +42,12 @@ public class MainActivity extends AppCompatActivity {
     private static final int POSITION_RECORD = 0;
     private static final int POSITION_LIST = 1;
     private static final int REQUEST_PERMISSIONS = 100;
+    private final static int REQUEST_CONSENT = 103;
+
+    private final static String PREF_CONSENT = "pn_consent";
+    private final static String PREF_LAST_CONSENT_ASKED_DATE = "pn_consent_date";
+
+    private boolean isActive = false;
 
     private ViewPager mPager;
     private SectionsPagerAdapter mPagerAdapter;
@@ -64,6 +82,22 @@ public class MainActivity extends AppCompatActivity {
         tabLayout.addOnTabSelectedListener(new TabLayout.ViewPagerOnTabSelectedListener(mPager));
 
         checkPermissions();
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        isActive = true;
+
+        new Handler(Looper.getMainLooper()).postDelayed(consentRunnable, 4000);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+
+        isActive = false;
     }
 
     @Override
@@ -144,6 +178,79 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public int getCount() {
             return 2;
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        if (requestCode == REQUEST_CONSENT) {
+            setConsent(resultCode == UserConsentActivity.RESULT_CONSENT_ACCEPTED);
+            showMoPubConsent();
+        } else {
+            super.onActivityResult(requestCode, resultCode, data);
+        }
+    }
+
+    private final Runnable consentRunnable = new Runnable() {
+        @Override
+        public void run() {
+            if (isActive && shouldAskForConsent()) {
+                if (HyBid.getUserDataManager().shouldAskConsent()) {
+                    Intent intent = HyBid.getUserDataManager().getConsentScreenIntent(MainActivity.this);
+                    startActivityForResult(intent, REQUEST_CONSENT);
+                } else {
+                    showMoPubConsent();
+                }
+            }
+        }
+    };
+
+    private void setConsent(boolean consent) {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putBoolean(PREF_CONSENT, consent);
+        editor.putLong(PREF_LAST_CONSENT_ASKED_DATE, System.currentTimeMillis());
+        editor.apply();
+    }
+
+    private boolean shouldAskForConsent() {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+
+        if (!preferences.contains(PREF_CONSENT)) {
+            return true;
+        }
+
+        boolean consentGiven = preferences.getBoolean(PREF_CONSENT, false);
+
+        if (consentGiven) {
+            return false;
+        } else {
+            long currentDate = System.currentTimeMillis();
+            long lastDate = preferences.getLong(PREF_LAST_CONSENT_ASKED_DATE, currentDate);
+
+            long difference = currentDate - lastDate;
+            int daysPassed = (int) (difference / (1000 * 60 * 60 * 24));
+
+            return daysPassed >= 30;
+        }
+    }
+
+    private void showMoPubConsent() {
+        final PersonalInfoManager infoManager = MoPub.getPersonalInformationManager();
+        if (infoManager.shouldShowConsentDialog()) {
+            infoManager.loadConsentDialog(new ConsentDialogListener() {
+                @Override
+                public void onConsentDialogLoaded() {
+                    if (isActive) {
+                        infoManager.showConsentDialog();
+                    }
+                }
+
+                @Override
+                public void onConsentDialogLoadFailed(@NonNull MoPubErrorCode moPubErrorCode) {
+
+                }
+            });
         }
     }
 }
