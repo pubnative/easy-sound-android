@@ -269,7 +269,7 @@ public class RecordFragment extends Fragment implements MoPubInterstitial.Inters
 
     @Override
     public void onInterstitialDismissed(MoPubInterstitial interstitial) {
-
+        disableRecordButtonWithTimeout();
     }
 
     @Override
