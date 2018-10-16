@@ -1,11 +1,11 @@
 package net.pubnative.easysound.activities;
 
 import android.Manifest;
-import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
@@ -45,6 +45,7 @@ public class MainActivity extends AppCompatActivity {
     private final static int REQUEST_CONSENT = 103;
 
     private final static String PREF_CONSENT = "pn_consent";
+    private final static String PREF_CONSENT_GAID = "pn_consent_gaid";
     private final static String PREF_LAST_CONSENT_ASKED_DATE = "pn_consent_date";
 
     private boolean isActive = false;
@@ -194,8 +195,8 @@ public class MainActivity extends AppCompatActivity {
     private final Runnable consentRunnable = new Runnable() {
         @Override
         public void run() {
-            if (isActive && shouldAskForConsent()) {
-                if (HyBid.getUserDataManager().shouldAskConsent()) {
+            if (isActive) {
+                if (shouldAskForConsent()) {
                     Intent intent = HyBid.getUserDataManager().getConsentScreenIntent(MainActivity.this);
                     startActivityForResult(intent, REQUEST_CONSENT);
                 } else {
@@ -209,11 +210,12 @@ public class MainActivity extends AppCompatActivity {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
         SharedPreferences.Editor editor = preferences.edit();
         editor.putBoolean(PREF_CONSENT, consent);
+        editor.putString(PREF_CONSENT_GAID, HyBid.getDeviceInfo().getAdvertisingId());
         editor.putLong(PREF_LAST_CONSENT_ASKED_DATE, System.currentTimeMillis());
         editor.apply();
     }
 
-    private boolean shouldAskForConsent() {
+    public boolean shouldAskForConsent() {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
 
         if (!preferences.contains(PREF_CONSENT)) {
@@ -221,17 +223,22 @@ public class MainActivity extends AppCompatActivity {
         }
 
         boolean consentGiven = preferences.getBoolean(PREF_CONSENT, false);
+        String consentGaid = preferences.getString(PREF_CONSENT_GAID, "");
 
-        if (consentGiven) {
-            return false;
+        if (!consentGaid.equalsIgnoreCase(HyBid.getDeviceInfo().getAdvertisingId())) {
+            return true;
         } else {
-            long currentDate = System.currentTimeMillis();
-            long lastDate = preferences.getLong(PREF_LAST_CONSENT_ASKED_DATE, currentDate);
+            if (consentGiven) {
+                return false;
+            } else {
+                long currentDate = System.currentTimeMillis();
+                long lastDate = preferences.getLong(PREF_LAST_CONSENT_ASKED_DATE, currentDate);
 
-            long difference = currentDate - lastDate;
-            int daysPassed = (int) (difference / (1000 * 60 * 60 * 24));
+                long difference = currentDate - lastDate;
+                int daysPassed = (int) (difference / (1000 * 60 * 60 * 24));
 
-            return daysPassed >= 30;
+                return daysPassed >= 30;
+            }
         }
     }
 
