@@ -89,22 +89,16 @@ public class RecordFragment extends Fragment implements MoPubInterstitial.Inters
         mRecordingPrompt = recordView.findViewById(R.id.recording_status_text);
 
         mRecordButton = recordView.findViewById(R.id.btnRecord);
-        mRecordButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onRecord(mStartRecording);
-                mStartRecording = !mStartRecording;
-            }
+        mRecordButton.setOnClickListener(v -> {
+            onRecord(mStartRecording);
+            mStartRecording = !mStartRecording;
         });
 
         mPauseButton = recordView.findViewById(R.id.btnPause);
         mPauseButton.setVisibility(View.GONE); //hide pause button before recording starts
-        mPauseButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onPauseRecord(mPauseRecording);
-                mPauseRecording = !mPauseRecording;
-            }
+        mPauseButton.setOnClickListener(v -> {
+            onPauseRecord(mPauseRecording);
+            mPauseRecording = !mPauseRecording;
         });
 
         return recordView;
@@ -138,20 +132,17 @@ public class RecordFragment extends Fragment implements MoPubInterstitial.Inters
                 //start Chronometer
                 mChronometer.setBase(SystemClock.elapsedRealtime());
                 mChronometer.start();
-                mChronometer.setOnChronometerTickListener(new Chronometer.OnChronometerTickListener() {
-                    @Override
-                    public void onChronometerTick(Chronometer chronometer) {
-                        if (mRecordPromptCount == 0) {
-                            mRecordingPrompt.setText(getString(R.string.record_in_progress) + ".");
-                        } else if (mRecordPromptCount == 1) {
-                            mRecordingPrompt.setText(getString(R.string.record_in_progress) + "..");
-                        } else if (mRecordPromptCount == 2) {
-                            mRecordingPrompt.setText(getString(R.string.record_in_progress) + "...");
-                            mRecordPromptCount = -1;
-                        }
-
-                        mRecordPromptCount++;
+                mChronometer.setOnChronometerTickListener(chronometer -> {
+                    if (mRecordPromptCount == 0) {
+                        mRecordingPrompt.setText(getString(R.string.record_in_progress) + ".");
+                    } else if (mRecordPromptCount == 1) {
+                        mRecordingPrompt.setText(getString(R.string.record_in_progress) + "..");
+                    } else if (mRecordPromptCount == 2) {
+                        mRecordingPrompt.setText(getString(R.string.record_in_progress) + "...");
+                        mRecordPromptCount = -1;
                     }
+
+                    mRecordPromptCount++;
                 });
 
                 //start RecordingService
@@ -191,12 +182,9 @@ public class RecordFragment extends Fragment implements MoPubInterstitial.Inters
     private void disableRecordButtonWithTimeout() {
         if (getView() != null) {
             mRecordButton.setEnabled(false);
-            getView().postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    if (getContext() != null && isResumed()) {
-                        mRecordButton.setEnabled(true);
-                    }
+            getView().postDelayed(() -> {
+                if (getContext() != null && isResumed()) {
+                    mRecordButton.setEnabled(true);
                 }
             }, DELAY_RECORD_BUTTON);
         }
@@ -208,14 +196,14 @@ public class RecordFragment extends Fragment implements MoPubInterstitial.Inters
             //pause recording
             mPauseButton.setCompoundDrawablesWithIntrinsicBounds
                     (R.drawable.ic_media_play ,0 ,0 ,0);
-            mRecordingPrompt.setText((String)getString(R.string.resume_recording_button).toUpperCase());
+            mRecordingPrompt.setText(getString(R.string.resume_recording_button).toUpperCase());
             timeWhenPaused = mChronometer.getBase() - SystemClock.elapsedRealtime();
             mChronometer.stop();
         } else {
             //resume recording
             mPauseButton.setCompoundDrawablesWithIntrinsicBounds
                     (R.drawable.ic_media_pause ,0 ,0 ,0);
-            mRecordingPrompt.setText((String)getString(R.string.pause_recording_button).toUpperCase());
+            mRecordingPrompt.setText(getString(R.string.pause_recording_button).toUpperCase());
             mChronometer.setBase(SystemClock.elapsedRealtime() + timeWhenPaused);
             mChronometer.start();
         }

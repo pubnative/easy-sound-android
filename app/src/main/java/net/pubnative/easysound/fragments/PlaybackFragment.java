@@ -22,6 +22,7 @@ import net.pubnative.easysound.R;
 import net.pubnative.easysound.RecordingItem;
 
 import java.io.IOException;
+import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
 public class PlaybackFragment extends DialogFragment{
@@ -82,11 +83,11 @@ public class PlaybackFragment extends DialogFragment{
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         View view = getActivity().getLayoutInflater().inflate(R.layout.fragment_media_playback, null);
 
-        mFileNameTextView = (TextView) view.findViewById(R.id.file_name_text_view);
-        mFileLengthTextView = (TextView) view.findViewById(R.id.file_length_text_view);
-        mCurrentProgressTextView = (TextView) view.findViewById(R.id.current_progress_text_view);
+        mFileNameTextView = view.findViewById(R.id.file_name_text_view);
+        mFileLengthTextView = view.findViewById(R.id.file_length_text_view);
+        mCurrentProgressTextView = view.findViewById(R.id.current_progress_text_view);
 
-        mSeekBar = (SeekBar) view.findViewById(R.id.seekbar);
+        mSeekBar = view.findViewById(R.id.seekbar);
         ColorFilter filter = new LightingColorFilter
                 (getResources().getColor(R.color.primary), getResources().getColor(R.color.primary));
         mSeekBar.getProgressDrawable().setColorFilter(filter);
@@ -102,7 +103,7 @@ public class PlaybackFragment extends DialogFragment{
                     long minutes = TimeUnit.MILLISECONDS.toMinutes(mMediaPlayer.getCurrentPosition());
                     long seconds = TimeUnit.MILLISECONDS.toSeconds(mMediaPlayer.getCurrentPosition())
                             - TimeUnit.MINUTES.toSeconds(minutes);
-                    mCurrentProgressTextView.setText(String.format("%02d:%02d", minutes,seconds));
+                    mCurrentProgressTextView.setText(String.format(Locale.ENGLISH, "%02d:%02d", minutes,seconds));
 
                     updateSeekBar();
 
@@ -129,23 +130,20 @@ public class PlaybackFragment extends DialogFragment{
                     long minutes = TimeUnit.MILLISECONDS.toMinutes(mMediaPlayer.getCurrentPosition());
                     long seconds = TimeUnit.MILLISECONDS.toSeconds(mMediaPlayer.getCurrentPosition())
                             - TimeUnit.MINUTES.toSeconds(minutes);
-                    mCurrentProgressTextView.setText(String.format("%02d:%02d", minutes,seconds));
+                    mCurrentProgressTextView.setText(String.format(Locale.ENGLISH,"%02d:%02d", minutes,seconds));
                     updateSeekBar();
                 }
             }
         });
 
-        mPlayButton = (FloatingActionButton) view.findViewById(R.id.fab_play);
-        mPlayButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onPlay(isPlaying);
-                isPlaying = !isPlaying;
-            }
+        mPlayButton = view.findViewById(R.id.fab_play);
+        mPlayButton.setOnClickListener(v -> {
+            onPlay(isPlaying);
+            isPlaying = !isPlaying;
         });
 
         mFileNameTextView.setText(item.getName());
-        mFileLengthTextView.setText(String.format("%02d:%02d", minutes,seconds));
+        mFileLengthTextView.setText(String.format(Locale.ENGLISH, "%02d:%02d", minutes,seconds));
 
         builder.setView(view);
 
@@ -213,22 +211,12 @@ public class PlaybackFragment extends DialogFragment{
             mMediaPlayer.prepare();
             mSeekBar.setMax(mMediaPlayer.getDuration());
 
-            mMediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
-                @Override
-                public void onPrepared(MediaPlayer mp) {
-                    mMediaPlayer.start();
-                }
-            });
+            mMediaPlayer.setOnPreparedListener(mp -> mMediaPlayer.start());
         } catch (IOException e) {
             Log.e(LOG_TAG, "prepare() failed");
         }
 
-        mMediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-            @Override
-            public void onCompletion(MediaPlayer mp) {
-                stopPlaying();
-            }
-        });
+        mMediaPlayer.setOnCompletionListener(mp -> stopPlaying());
 
         updateSeekBar();
 
@@ -247,12 +235,7 @@ public class PlaybackFragment extends DialogFragment{
             mSeekBar.setMax(mMediaPlayer.getDuration());
             mMediaPlayer.seekTo(progress);
 
-            mMediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-                @Override
-                public void onCompletion(MediaPlayer mp) {
-                    stopPlaying();
-                }
-            });
+            mMediaPlayer.setOnCompletionListener(mp -> stopPlaying());
 
         } catch (IOException e) {
             Log.e(LOG_TAG, "prepare() failed");
@@ -294,21 +277,18 @@ public class PlaybackFragment extends DialogFragment{
     }
 
     //updating mSeekBar
-    private Runnable mRunnable = new Runnable() {
-        @Override
-        public void run() {
-            if(mMediaPlayer != null){
+    private Runnable mRunnable = () -> {
+        if(mMediaPlayer != null){
 
-                int mCurrentPosition = mMediaPlayer.getCurrentPosition();
-                mSeekBar.setProgress(mCurrentPosition);
+            int mCurrentPosition = mMediaPlayer.getCurrentPosition();
+            mSeekBar.setProgress(mCurrentPosition);
 
-                long minutes = TimeUnit.MILLISECONDS.toMinutes(mCurrentPosition);
-                long seconds = TimeUnit.MILLISECONDS.toSeconds(mCurrentPosition)
-                        - TimeUnit.MINUTES.toSeconds(minutes);
-                mCurrentProgressTextView.setText(String.format("%02d:%02d", minutes, seconds));
+            long minutes = TimeUnit.MILLISECONDS.toMinutes(mCurrentPosition);
+            long seconds = TimeUnit.MILLISECONDS.toSeconds(mCurrentPosition)
+                    - TimeUnit.MINUTES.toSeconds(minutes);
+            mCurrentProgressTextView.setText(String.format(Locale.ENGLISH, "%02d:%02d", minutes, seconds));
 
-                updateSeekBar();
-            }
+            updateSeekBar();
         }
     };
 

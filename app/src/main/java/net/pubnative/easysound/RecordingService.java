@@ -1,19 +1,12 @@
 package net.pubnative.easysound;
 
-import android.app.Notification;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.app.Service;
-import android.content.Context;
 import android.content.Intent;
 import android.media.MediaRecorder;
 import android.os.Environment;
 import android.os.IBinder;
-import androidx.core.app.NotificationCompat;
 import android.util.Log;
 import android.widget.Toast;
-
-import net.pubnative.easysound.activities.MainActivity;
 
 import java.io.File;
 import java.io.IOException;
@@ -91,19 +84,16 @@ public class RecordingService extends Service {
             mRecorder.start();
             mStartingTimeMillis = System.currentTimeMillis();
 
-            //startTimer();
-            //startForeground(1, createNotification());
-
         } catch (IOException e) {
             Log.e(LOG_TAG, "prepare() failed");
         }
     }
 
-    public void setFileNameAndPath(){
+    public void setFileNameAndPath() {
         int count = 0;
         File f;
 
-        do{
+        do {
             count++;
 
             mFileName = getString(R.string.default_file_name)
@@ -112,7 +102,7 @@ public class RecordingService extends Service {
             mFilePath += "/EasySound/" + mFileName;
 
             f = new File(mFilePath);
-        }while (f.exists() && !f.isDirectory());
+        } while (f.exists() && !f.isDirectory());
     }
 
     public void stopRecording() {
@@ -132,38 +122,8 @@ public class RecordingService extends Service {
         try {
             mDatabase.addRecording(mFileName, mFilePath, mElapsedMillis);
 
-        } catch (Exception e){
+        } catch (Exception e) {
             Log.e(LOG_TAG, "exception", e);
         }
-    }
-
-    private void startTimer() {
-        mTimer = new Timer();
-        mIncrementTimerTask = new TimerTask() {
-            @Override
-            public void run() {
-                mElapsedSeconds++;
-                if (onTimerChangedListener != null)
-                    onTimerChangedListener.onTimerChanged(mElapsedSeconds);
-                NotificationManager mgr = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-                mgr.notify(1, createNotification());
-            }
-        };
-        mTimer.scheduleAtFixedRate(mIncrementTimerTask, 1000, 1000);
-    }
-
-    //TODO:
-    private Notification createNotification() {
-        NotificationCompat.Builder mBuilder =
-                new NotificationCompat.Builder(getApplicationContext())
-                        .setSmallIcon(R.drawable.ic_mic_white_36dp)
-                        .setContentTitle(getString(R.string.notification_recording))
-                        .setContentText(mTimerFormat.format(mElapsedSeconds * 1000))
-                        .setOngoing(true);
-
-        mBuilder.setContentIntent(PendingIntent.getActivities(getApplicationContext(), 0,
-                new Intent[]{new Intent(getApplicationContext(), MainActivity.class)}, 0));
-
-        return mBuilder.build();
     }
 }

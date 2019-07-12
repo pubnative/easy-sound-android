@@ -2,7 +2,6 @@ package net.pubnative.easysound.adapters;
 
 import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Environment;
@@ -26,6 +25,7 @@ import net.pubnative.easysound.fragments.PlaybackFragment;
 import net.pubnative.easysound.listeners.OnDatabaseChangedListener;
 
 import java.io.File;
+import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 import java.util.ArrayList;
 
@@ -59,7 +59,7 @@ public class FileViewerAdapter extends RecyclerView.Adapter<FileViewerAdapter.Re
                 - TimeUnit.MINUTES.toSeconds(minutes);
 
         holder.vName.setText(item.getName());
-        holder.vLength.setText(String.format("%02d:%02d", minutes, seconds));
+        holder.vLength.setText(String.format(Locale.ENGLISH, "%02d:%02d", minutes, seconds));
         holder.vDateAdded.setText(
             DateUtils.formatDateTime(
                 mContext,
@@ -69,64 +69,52 @@ public class FileViewerAdapter extends RecyclerView.Adapter<FileViewerAdapter.Re
         );
 
         // define an on click listener to open PlaybackFragment
-        holder.cardView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                try {
-                    PlaybackFragment playbackFragment =
-                            new PlaybackFragment().newInstance(getItem(holder.getPosition()));
+        holder.cardView.setOnClickListener(view -> {
+            try {
+                PlaybackFragment playbackFragment =
+                        new PlaybackFragment().newInstance(getItem(holder.getPosition()));
 
-                    FragmentTransaction transaction = ((FragmentActivity) mContext)
-                            .getSupportFragmentManager()
-                            .beginTransaction();
+                FragmentTransaction transaction = ((FragmentActivity) mContext)
+                        .getSupportFragmentManager()
+                        .beginTransaction();
 
-                    playbackFragment.show(transaction, "dialog_playback");
+                playbackFragment.show(transaction, "dialog_playback");
 
-                } catch (Exception e) {
-                    Log.e(LOG_TAG, "exception", e);
-                }
+            } catch (Exception e) {
+                Log.e(LOG_TAG, "exception", e);
             }
         });
 
-        holder.cardView.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
+        holder.cardView.setOnLongClickListener(v -> {
 
-                ArrayList<String> entrys = new ArrayList<String>();
-                entrys.add(mContext.getString(R.string.dialog_file_share));
-                entrys.add(mContext.getString(R.string.dialog_file_rename));
-                entrys.add(mContext.getString(R.string.dialog_file_delete));
+            ArrayList<String> entrys = new ArrayList<>();
+            entrys.add(mContext.getString(R.string.dialog_file_share));
+            entrys.add(mContext.getString(R.string.dialog_file_rename));
+            entrys.add(mContext.getString(R.string.dialog_file_delete));
 
-                final CharSequence[] items = entrys.toArray(new CharSequence[entrys.size()]);
+            final CharSequence[] items = entrys.toArray(new CharSequence[entrys.size()]);
 
 
-                // File delete confirm
-                AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
-                builder.setTitle(mContext.getString(R.string.dialog_title_options));
-                builder.setItems(items, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int item) {
-                        if (item == 0) {
-                            shareFileDialog(holder.getPosition());
-                        } if (item == 1) {
-                            renameFileDialog(holder.getPosition());
-                        } else if (item == 2) {
-                            deleteFileDialog(holder.getPosition());
-                        }
-                    }
-                });
-                builder.setCancelable(true);
-                builder.setNegativeButton(mContext.getString(R.string.dialog_action_cancel),
-                        new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int id) {
-                                dialog.cancel();
-                            }
-                        });
+            // File delete confirm
+            AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+            builder.setTitle(mContext.getString(R.string.dialog_title_options));
+            builder.setItems(items, (dialog, item) -> {
+                if (item == 0) {
+                    shareFileDialog(holder.getPosition());
+                } if (item == 1) {
+                    renameFileDialog(holder.getPosition());
+                } else if (item == 2) {
+                    deleteFileDialog(holder.getPosition());
+                }
+            });
+            builder.setCancelable(true);
+            builder.setNegativeButton(mContext.getString(R.string.dialog_action_cancel),
+                    (dialog, id) -> dialog.cancel());
 
-                AlertDialog alert = builder.create();
-                alert.show();
+            AlertDialog alert = builder.create();
+            alert.show();
 
-                return false;
-            }
+            return false;
         });
     }
 
@@ -142,17 +130,17 @@ public class FileViewerAdapter extends RecyclerView.Adapter<FileViewerAdapter.Re
         return new RecordingsViewHolder(itemView);
     }
 
-    public static class RecordingsViewHolder extends RecyclerView.ViewHolder {
-        protected TextView vName;
-        protected TextView vLength;
-        protected TextView vDateAdded;
-        protected View cardView;
+    static class RecordingsViewHolder extends RecyclerView.ViewHolder {
+        private TextView vName;
+        private TextView vLength;
+        private TextView vDateAdded;
+        private View cardView;
 
-        public RecordingsViewHolder(View v) {
+        RecordingsViewHolder(View v) {
             super(v);
-            vName = (TextView) v.findViewById(R.id.file_name_text);
-            vLength = (TextView) v.findViewById(R.id.file_length_text);
-            vDateAdded = (TextView) v.findViewById(R.id.file_date_added_text);
+            vName = v.findViewById(R.id.file_name_text);
+            vLength = v.findViewById(R.id.file_length_text);
+            vDateAdded = v.findViewById(R.id.file_date_added_text);
             cardView = v.findViewById(R.id.card_view);
         }
     }
@@ -214,7 +202,7 @@ public class FileViewerAdapter extends RecyclerView.Adapter<FileViewerAdapter.Re
         if (f.exists() && !f.isDirectory()) {
             //file name is not unique, cannot rename file.
             Toast.makeText(mContext,
-                    String.format(mContext.getString(R.string.toast_file_exists), name),
+                    String.format(Locale.ENGLISH, mContext.getString(R.string.toast_file_exists), name),
                     Toast.LENGTH_SHORT).show();
 
         } else {
@@ -241,30 +229,24 @@ public class FileViewerAdapter extends RecyclerView.Adapter<FileViewerAdapter.Re
         LayoutInflater inflater = LayoutInflater.from(mContext);
         View view = inflater.inflate(R.layout.dialog_rename_file, null);
 
-        final EditText input = (EditText) view.findViewById(R.id.new_name);
+        final EditText input = view.findViewById(R.id.new_name);
 
         renameFileBuilder.setTitle(mContext.getString(R.string.dialog_title_rename));
         renameFileBuilder.setCancelable(true);
         renameFileBuilder.setPositiveButton(mContext.getString(R.string.dialog_action_ok),
-                new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        try {
-                            String value = input.getText().toString().trim() + ".mp4";
-                            rename(position, value);
+                (dialog, id) -> {
+                    try {
+                        String value = input.getText().toString().trim() + ".mp4";
+                        rename(position, value);
 
-                        } catch (Exception e) {
-                            Log.e(LOG_TAG, "exception", e);
-                        }
-
-                        dialog.cancel();
+                    } catch (Exception e) {
+                        Log.e(LOG_TAG, "exception", e);
                     }
+
+                    dialog.cancel();
                 });
         renameFileBuilder.setNegativeButton(mContext.getString(R.string.dialog_action_cancel),
-                new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        dialog.cancel();
-                    }
-                });
+                (dialog, id) -> dialog.cancel());
 
         renameFileBuilder.setView(view);
         AlertDialog alert = renameFileBuilder.create();
@@ -278,25 +260,19 @@ public class FileViewerAdapter extends RecyclerView.Adapter<FileViewerAdapter.Re
         confirmDelete.setMessage(mContext.getString(R.string.dialog_text_delete));
         confirmDelete.setCancelable(true);
         confirmDelete.setPositiveButton(mContext.getString(R.string.dialog_action_yes),
-                new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        try {
-                            //remove item from database, recyclerview, and storage
-                            remove(position);
+                (dialog, id) -> {
+                    try {
+                        //remove item from database, recyclerview, and storage
+                        remove(position);
 
-                        } catch (Exception e) {
-                            Log.e(LOG_TAG, "exception", e);
-                        }
-
-                        dialog.cancel();
+                    } catch (Exception e) {
+                        Log.e(LOG_TAG, "exception", e);
                     }
+
+                    dialog.cancel();
                 });
         confirmDelete.setNegativeButton(mContext.getString(R.string.dialog_action_no),
-                new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        dialog.cancel();
-                    }
-                });
+                (dialog, id) -> dialog.cancel());
 
         AlertDialog alert = confirmDelete.create();
         alert.show();

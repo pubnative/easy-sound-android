@@ -54,7 +54,7 @@ public class FileViewerFragment extends Fragment implements MoPubView.BannerAdLi
         RecyclerView mRecyclerView = v.findViewById(R.id.recyclerView);
         mRecyclerView.setHasFixedSize(true);
         LinearLayoutManager llm = new LinearLayoutManager(getActivity());
-        llm.setOrientation(LinearLayoutManager.VERTICAL);
+        llm.setOrientation(RecyclerView.VERTICAL);
 
         //newest to oldest order (database stores from oldest to newest)
         llm.setReverseLayout(true);
@@ -104,7 +104,8 @@ public class FileViewerFragment extends Fragment implements MoPubView.BannerAdLi
             public void onRequestSuccess(Ad ad) {
                 if (getContext() != null && isResumed()) {
                     mBannerView.setAdUnitId(getString(R.string.mopub_banner_ad_unit_id));
-                    mBannerView.setKeywords(PrebidUtils.getPrebidKeywords(ad, getString(R.string.pnlite_banner_zone_id)));
+                    String keywords = PrebidUtils.getPrebidKeywords(ad, getString(R.string.pnlite_banner_zone_id));
+                    mBannerView.setKeywords(keywords);
                     mBannerView.loadAd();
                 }
             }
@@ -168,7 +169,3 @@ public class FileViewerFragment extends Fragment implements MoPubView.BannerAdLi
                 }
             };
 }
-
-
-
-
