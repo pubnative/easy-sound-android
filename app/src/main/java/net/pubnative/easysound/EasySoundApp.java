@@ -11,13 +11,13 @@ public class EasySoundApp extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        HyBid.initialize("e7621bc9cc5649a9b72693faef56d5d7", this, success -> {
+        /*HyBid.initialize("dde3c298b47648459f8ada4a982fa92d", this, success -> {
             SdkConfiguration sdkConfiguration = new SdkConfiguration
                     .Builder(getString(R.string.mopub_banner_ad_unit_id))
                     .build();
             MoPub.initializeSdk(EasySoundApp.this, sdkConfiguration, () -> {
 
             });
-        });
+        });*/
     }
 }

@@ -20,23 +20,27 @@ import androidx.viewpager.widget.ViewPager;
 import android.os.Handler;
 import android.os.Looper;
 import android.preference.PreferenceManager;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.tabs.TabLayout;
 import com.mopub.common.MoPub;
+import com.mopub.common.SdkConfiguration;
 import com.mopub.common.privacy.ConsentDialogListener;
 import com.mopub.common.privacy.PersonalInfoManager;
 import com.mopub.mobileads.MoPubErrorCode;
 
+import net.pubnative.easysound.EasySoundApp;
 import net.pubnative.easysound.R;
 import net.pubnative.easysound.fragments.FileViewerFragment;
 import net.pubnative.easysound.fragments.RecordFragment;
 import net.pubnative.lite.sdk.HyBid;
 import net.pubnative.lite.sdk.consent.UserConsentActivity;
+import net.pubnative.lite.sdk.interstitial.HyBidInterstitialAd;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements HyBidInterstitialAd.Listener {
 
     private static final String LOG_TAG = MainActivity.class.getSimpleName();
     private static final int POSITION_RECORD = 0;
@@ -71,6 +75,8 @@ public class MainActivity extends AppCompatActivity {
         mPager = findViewById(R.id.container);
         mPager.setAdapter(mPagerAdapter);
         TabLayout tabLayout = findViewById(R.id.tabs);
+
+
         mPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout) {
             @Override
             public void onPageSelected(int position) {
@@ -83,6 +89,26 @@ public class MainActivity extends AppCompatActivity {
         tabLayout.addOnTabSelectedListener(new TabLayout.ViewPagerOnTabSelectedListener(mPager));
 
         checkPermissions();
+
+        if (savedInstanceState == null) {
+            HyBid.initialize("dde3c298b47648459f8ada4a982fa92d", MainActivity.this.getApplication(), success -> {
+                SdkConfiguration sdkConfiguration = new SdkConfiguration
+                        .Builder(getString(R.string.mopub_banner_ad_unit_id))
+                        .build();
+                MoPub.initializeSdk(MainActivity.this.getApplication(), sdkConfiguration, () -> {
+
+                });
+            });
+        }
+        loadInterstitial();
+    }
+
+    HyBidInterstitialAd testAd = null;
+
+    private void loadInterstitial() {
+
+        testAd = new HyBidInterstitialAd(this, "3", this);
+        testAd.load();
     }
 
     @Override
@@ -91,7 +117,7 @@ public class MainActivity extends AppCompatActivity {
 
         isActive = true;
 
-        new Handler(Looper.getMainLooper()).postDelayed(consentRunnable, 4000);
+       // new Handler(Looper.getMainLooper()).postDelayed(consentRunnable, 4000);
     }
 
     @Override
@@ -154,6 +180,31 @@ public class MainActivity extends AppCompatActivity {
             default:
                 super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         }
+    }
+
+    @Override
+    public void onInterstitialLoaded() {
+        testAd.show();
+    }
+
+    @Override
+    public void onInterstitialLoadFailed(Throwable throwable) {
+
+    }
+
+    @Override
+    public void onInterstitialImpression() {
+
+    }
+
+    @Override
+    public void onInterstitialDismissed() {
+
+    }
+
+    @Override
+    public void onInterstitialClick() {
+
     }
 
     private class SectionsPagerAdapter extends FragmentPagerAdapter {
@@ -260,4 +311,6 @@ public class MainActivity extends AppCompatActivity {
             });
         }
     }
+
+
 }
