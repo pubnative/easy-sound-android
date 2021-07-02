@@ -1,6 +1,7 @@
 package net.pubnative.easysound.activities;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -15,6 +16,7 @@ import androidx.fragment.app.FragmentPagerAdapter;
 import androidx.core.content.ContextCompat;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.multidex.MultiDex;
 import androidx.viewpager.widget.ViewPager;
 
 import android.os.Handler;
@@ -60,6 +62,12 @@ public class MainActivity extends AppCompatActivity implements HyBidInterstitial
     private FileViewerFragment mFilesFragment;
 
     @Override
+    protected void attachBaseContext(Context base) {
+        super.attachBaseContext(base);
+        MultiDex.install(this);
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
@@ -75,7 +83,6 @@ public class MainActivity extends AppCompatActivity implements HyBidInterstitial
         mPager = findViewById(R.id.container);
         mPager.setAdapter(mPagerAdapter);
         TabLayout tabLayout = findViewById(R.id.tabs);
-
 
         mPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout) {
             @Override
