@@ -1,0 +1,56 @@
+{
+  "project_info": {
+    "project_number": "329578635722",
+    "firebase_url": "https://pubnative-easy-sound.firebaseio.com",
+    "project_id": "pubnative-easy-sound",
+    "storage_bucket": "pubnative-easy-sound.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:329578635722:android:84789f043f47cb8e",
+        "android_client_info": {
+          "package_name": "net.pubnative.easysound"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "329578635722-3cjicnn5l0f97spo75g8ddop96jock2l.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "net.pubnative.easysound",
+            "certificate_hash": "9b586304735020740f2d5791bd470a390e508c5a"
+          }
+        },
+        {
+          "client_id": "329578635722-kg563r1uc26ojjdcsu58vo68r048ojnr.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "net.pubnative.easysound",
+            "certificate_hash": "fd2809de7f63cbf16d3d704d4522c4741acd7516"
+          }
+        },
+        {
+          "client_id": "329578635722-fsmmjmks31ccm8iiorvaf2colhp80ev4.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBh3gu7fMcgBto5__IwIi6fjGzAG5PODdE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "329578635722-fsmmjmks31ccm8iiorvaf2colhp80ev4.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
