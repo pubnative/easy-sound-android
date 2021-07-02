@@ -11,8 +11,8 @@ android {
         applicationId "net.pubnative.easysound"
         minSdkVersion 19
         targetSdkVersion 29
-        versionCode 401
-        versionName "0.4.1"
+        versionCode 402
+        versionName "0.4.2"
         multiDexEnabled true
         testInstrumentationRunner = 'android.support.test.runner.AndroidJUnitRunner'
     }
