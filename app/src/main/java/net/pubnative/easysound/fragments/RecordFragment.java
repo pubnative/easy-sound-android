@@ -209,6 +209,12 @@ public class RecordFragment extends Fragment implements MoPubInterstitial.Inters
         }
     }
 
+    public void pauseOnBackPressed(){
+        if (mPauseRecording){
+            onRecord(false);
+        }
+    }
+
     private void loadInterstitial() {
         mInterstitial = new MoPubInterstitial(getActivity(), getString(R.string.mopub_interstitial_ad_unit_id));
         mInterstitial.setInterstitialAdListener(this);

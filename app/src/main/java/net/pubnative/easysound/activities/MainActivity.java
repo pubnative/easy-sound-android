@@ -136,7 +136,8 @@ public class MainActivity extends AppCompatActivity implements HyBidInterstitial
 
     @Override
     public void onBackPressed() {
-        //super.onBackPressed(); Disable back button
+        mRecordFragment.pauseOnBackPressed();
+        super.onBackPressed();
     }
 
     @Override
