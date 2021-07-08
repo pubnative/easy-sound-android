@@ -75,7 +75,9 @@ public class MainActivity extends AppCompatActivity implements HyBidInterstitial
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        mRecordFragment = RecordFragment.newInstance(POSITION_RECORD);
+        if (mRecordFragment == null) {
+            mRecordFragment = RecordFragment.newInstance(POSITION_RECORD);
+        }
         mFilesFragment = FileViewerFragment.newInstance(POSITION_LIST);
 
         mPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
@@ -132,6 +134,12 @@ public class MainActivity extends AppCompatActivity implements HyBidInterstitial
         super.onStop();
 
         isActive = false;
+    }
+
+    @Override
+    public void onBackPressed() {
+        mRecordFragment.pauseOnBackPressed();
+        super.onBackPressed();
     }
 
     @Override
