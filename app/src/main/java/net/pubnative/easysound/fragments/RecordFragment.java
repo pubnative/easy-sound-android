@@ -19,21 +19,16 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.mopub.mobileads.MoPubErrorCode;
-import com.mopub.mobileads.MoPubInterstitial;
 
 import net.pubnative.easysound.R;
 import net.pubnative.easysound.RecordingService;
 import net.pubnative.easysound.activities.MainActivity;
-import net.pubnative.lite.sdk.api.InterstitialRequestManager;
-import net.pubnative.lite.sdk.api.RequestManager;
-import net.pubnative.lite.sdk.models.Ad;
-import net.pubnative.lite.sdk.utils.Logger;
-import net.pubnative.lite.sdk.utils.PrebidUtils;
+import net.pubnative.lite.sdk.VideoListener;
+import net.pubnative.lite.sdk.interstitial.HyBidInterstitialAd;
 
 import java.io.File;
 
-public class RecordFragment extends Fragment implements MoPubInterstitial.InterstitialAdListener {
+public class RecordFragment extends Fragment implements HyBidInterstitialAd.Listener, VideoListener {
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_POSITION = "position";
     private static final String LOG_TAG = RecordFragment.class.getSimpleName();
@@ -52,7 +47,7 @@ public class RecordFragment extends Fragment implements MoPubInterstitial.Inters
     private boolean mStartRecording = true;
     private boolean mPauseRecording = true;
 
-    private MoPubInterstitial mInterstitial;
+    private HyBidInterstitialAd mInterstitial;
 
     private Chronometer mChronometer = null;
     long timeWhenPaused = 0; //stores time when user clicks pause button
@@ -102,6 +97,9 @@ public class RecordFragment extends Fragment implements MoPubInterstitial.Inters
             onPauseRecord(mPauseRecording);
             mPauseRecording = !mPauseRecording;
         });
+
+        mInterstitial = new HyBidInterstitialAd(getActivity(), "4", this);
+        mInterstitial.setVideoSkipOffset(5);
 
         return recordView;
     }
@@ -228,28 +226,7 @@ public class RecordFragment extends Fragment implements MoPubInterstitial.Inters
     }
 
     private void loadInterstitial() {
-        mInterstitial = new MoPubInterstitial(getActivity(), getString(R.string.mopub_interstitial_ad_unit_id));
-        mInterstitial.setInterstitialAdListener(this);
-        RequestManager requestManager = new InterstitialRequestManager();
-        requestManager.setZoneId(getString(R.string.pnlite_interstitial_zone_id));
-        requestManager.setRequestListener(new RequestManager.RequestListener() {
-            @Override
-            public void onRequestSuccess(Ad ad) {
-                if (getContext() != null && isResumed()) {
-                    mInterstitial.setKeywords(PrebidUtils.getPrebidKeywords(ad, getString(R.string.pnlite_interstitial_zone_id)));
-                    mInterstitial.load();
-                }
-            }
-
-            @Override
-            public void onRequestFail(Throwable throwable) {
-                if (getContext() != null && isResumed()) {
-                    mInterstitial.load();
-                }
-                Log.e(LOG_TAG, throwable.getMessage());
-            }
-        });
-        requestManager.requestAd();
+        mInterstitial.load();
     }
 
     private void showInterstitial() {
@@ -258,28 +235,56 @@ public class RecordFragment extends Fragment implements MoPubInterstitial.Inters
         }
     }
 
+    // HyBid Interstitial Listeners
     @Override
-    public void onInterstitialLoaded(MoPubInterstitial interstitial) {
-
+    public void onInterstitialClick() {
+        Log.d(LOG_TAG, "onInterstitialClick");
     }
 
     @Override
-    public void onInterstitialFailed(MoPubInterstitial interstitial, MoPubErrorCode errorCode) {
-
-    }
-
-    @Override
-    public void onInterstitialShown(MoPubInterstitial interstitial) {
-
-    }
-
-    @Override
-    public void onInterstitialDismissed(MoPubInterstitial interstitial) {
+    public void onInterstitialDismissed() {
+        Log.d(LOG_TAG, "onInterstitialDismissed");
         disableRecordButtonWithTimeout();
     }
 
     @Override
-    public void onInterstitialClicked(MoPubInterstitial interstitial) {
+    public void onInterstitialImpression() {
+        Log.d(LOG_TAG, "onInterstitialImpression");
+    }
 
+    @Override
+    public void onInterstitialLoadFailed(@Nullable Throwable throwable) {
+        Log.d(LOG_TAG, "onInterstitialLoadFailed");
+    }
+
+    @Override
+    public void onInterstitialLoaded() {
+        Log.d(LOG_TAG, "onInterstitialLoaded");
+    }
+
+    // HyBid Interstitial Video Listeners
+    @Override
+    public void onVideoError(int i) {
+        Log.d(LOG_TAG, "onVideoError");
+    }
+
+    @Override
+    public void onVideoStarted() {
+        Log.d(LOG_TAG, "onVideoStarted");
+    }
+
+    @Override
+    public void onVideoDismissed(int i) {
+        Log.d(LOG_TAG, "onVideoDismissed");
+    }
+
+    @Override
+    public void onVideoFinished() {
+        Log.d(LOG_TAG, "onVideoFinished");
+    }
+
+    @Override
+    public void onVideoSkipped() {
+        Log.d(LOG_TAG, "onVideoSkipped");
     }
 }

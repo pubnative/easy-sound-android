@@ -5,13 +5,14 @@
     android:layout_height="match_parent"
     tools:context="net.pubnative.easysound.fragments.FileViewerFragment">
 
-    <com.mopub.mobileads.MoPubView
+    <net.pubnative.lite.sdk.views.HyBidBannerAdView
         android:id="@+id/banner_container"
         android:layout_width="320dp"
         android:layout_height="50dp"
-        android:layout_centerHorizontal="true"
+        android:visibility="gone"
         android:layout_alignParentBottom="true"
-        android:visibility="gone"/>
+        android:layout_centerHorizontal="true"/>
+
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerView"
