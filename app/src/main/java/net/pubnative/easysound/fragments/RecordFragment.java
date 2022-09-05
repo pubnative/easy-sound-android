@@ -1,6 +1,7 @@
 package net.pubnative.easysound.fragments;
 
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.SystemClock;
@@ -27,6 +28,7 @@ import net.pubnative.easysound.activities.MainActivity;
 import net.pubnative.lite.sdk.api.InterstitialRequestManager;
 import net.pubnative.lite.sdk.api.RequestManager;
 import net.pubnative.lite.sdk.models.Ad;
+import net.pubnative.lite.sdk.utils.Logger;
 import net.pubnative.lite.sdk.utils.PrebidUtils;
 
 import java.io.File;
@@ -123,7 +125,15 @@ public class RecordFragment extends Fragment implements MoPubInterstitial.Inters
                 mRecordButton.setImageResource(R.drawable.ic_media_stop);
                 //mPauseButton.setVisibility(View.VISIBLE);
                 Toast.makeText(getActivity(), R.string.toast_recording_start, Toast.LENGTH_SHORT).show();
-                File folder = new File(Environment.getExternalStorageDirectory() + "/EasySound");
+
+                File folder;
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                    String path = String.valueOf(getContext().getCacheDir());
+                    folder = new File(path);
+                } else {
+                    folder = new File(Environment.getExternalStorageDirectory() + "/EasySound");
+                }
+
                 if (!folder.exists()) {
                     //folder /EasySound doesn't exist, create the folder
                     folder.mkdir();

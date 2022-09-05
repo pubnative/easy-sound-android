@@ -3,12 +3,16 @@ package net.pubnative.easysound;
 import android.app.Service;
 import android.content.Intent;
 import android.media.MediaRecorder;
+import android.os.Build;
 import android.os.Environment;
 import android.os.IBinder;
 import android.util.Log;
 import android.widget.Toast;
 
+import androidx.annotation.RequiresApi;
+
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
@@ -84,8 +88,8 @@ public class RecordingService extends Service {
             mRecorder.start();
             mStartingTimeMillis = System.currentTimeMillis();
 
-        } catch (IOException e) {
-            Log.e(LOG_TAG, "prepare() failed");
+        } catch (IOException | IllegalStateException e) {
+            Log.e(LOG_TAG, "prepare() failed with exception: " + e.getMessage());
         }
     }
 
@@ -96,12 +100,20 @@ public class RecordingService extends Service {
         do {
             count++;
 
-            mFileName = getString(R.string.default_file_name)
-                    + "_" + (mDatabase.getCount() + count) + ".mp4";
-            mFilePath = Environment.getExternalStorageDirectory().getAbsolutePath();
-            mFilePath += "/EasySound/" + mFileName;
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                String path = String.valueOf(getApplicationContext().getCacheDir());
 
+                mFileName = getString(R.string.default_file_name)
+                        + "_" + (mDatabase.getCount() + count) + ".mp4";
+                mFilePath = path + mFileName;
+            } else {
+                mFileName = getString(R.string.default_file_name)
+                        + "_" + (mDatabase.getCount() + count) + ".mp4";
+                mFilePath = Environment.getExternalStorageDirectory().getAbsolutePath();
+                mFilePath += "/EasySound/" + mFileName;
+            }
             f = new File(mFilePath);
+
         } while (f.exists() && !f.isDirectory());
     }
 
