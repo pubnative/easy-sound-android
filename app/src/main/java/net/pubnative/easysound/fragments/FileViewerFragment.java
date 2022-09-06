@@ -13,23 +13,17 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.mopub.mobileads.MoPubErrorCode;
-import com.mopub.mobileads.MoPubView;
-
 import net.pubnative.easysound.R;
 import net.pubnative.easysound.adapters.FileViewerAdapter;
-import net.pubnative.lite.sdk.api.BannerRequestManager;
-import net.pubnative.lite.sdk.api.RequestManager;
-import net.pubnative.lite.sdk.models.Ad;
-import net.pubnative.lite.sdk.utils.PrebidUtils;
+import net.pubnative.lite.sdk.views.HyBidBannerAdView;
 
-public class FileViewerFragment extends Fragment implements MoPubView.BannerAdListener {
+public class FileViewerFragment extends Fragment implements HyBidBannerAdView.Listener{
     private static final String ARG_POSITION = "position";
     private static final String LOG_TAG = "FileViewerFragment";
 
     private int position;
     private FileViewerAdapter mFileViewerAdapter;
-    private MoPubView mBannerView;
+    private HyBidBannerAdView mBannerView;
 
     public static FileViewerFragment newInstance(int position) {
         FileViewerFragment f = new FileViewerFragment();
@@ -67,7 +61,7 @@ public class FileViewerFragment extends Fragment implements MoPubView.BannerAdLi
         mRecyclerView.setAdapter(mFileViewerAdapter);
 
         mBannerView = v.findViewById(R.id.banner_container);
-        mBannerView.setAutorefreshEnabled(false);
+        mBannerView.setAutoRefreshTimeInSeconds(15);
 
         return v;
     }
@@ -75,9 +69,6 @@ public class FileViewerFragment extends Fragment implements MoPubView.BannerAdLi
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
-        mBannerView.setBannerAdListener(this);
-        mBannerView.setAutorefreshEnabled(false);
     }
 
     @Override
@@ -97,55 +88,8 @@ public class FileViewerFragment extends Fragment implements MoPubView.BannerAdLi
     }
 
     public void loadAd() {
-        RequestManager requestManager = new BannerRequestManager();
-        requestManager.setZoneId(getString(R.string.pnlite_banner_zone_id));
-        requestManager.setRequestListener(new RequestManager.RequestListener() {
-            @Override
-            public void onRequestSuccess(Ad ad) {
-                if (getContext() != null && isResumed()) {
-                    mBannerView.setAdUnitId(getString(R.string.mopub_banner_ad_unit_id));
-                    String keywords = PrebidUtils.getPrebidKeywords(ad, getString(R.string.pnlite_banner_zone_id));
-                    mBannerView.setKeywords(keywords);
-                    mBannerView.loadAd();
-                }
-            }
-
-            @Override
-            public void onRequestFail(Throwable throwable) {
-                if (getContext() != null && isResumed()) {
-                    mBannerView.setAdUnitId(getString(R.string.mopub_banner_ad_unit_id));
-                    mBannerView.loadAd();
-                }
-                Log.e(LOG_TAG, throwable.getMessage());
-            }
-        });
-        requestManager.requestAd();
+        mBannerView.load(getString(R.string.pnlite_banner_zone_id),this);
     }
-
-    @Override
-    public void onBannerLoaded(MoPubView banner) {
-        if (getContext() != null && isResumed()) {
-            mBannerView.setVisibility(View.VISIBLE);
-        }
-    }
-
-    @Override
-    public void onBannerFailed(MoPubView banner, MoPubErrorCode errorCode) {
-        Log.e(LOG_TAG, errorCode.toString());
-    }
-
-    @Override
-    public void onBannerClicked(MoPubView banner) {
-        if (getContext() != null && isResumed()) {
-            mBannerView.setVisibility(View.GONE);
-        }
-    }
-
-    @Override
-    public void onBannerExpanded(MoPubView banner) { }
-
-    @Override
-    public void onBannerCollapsed(MoPubView banner) { }
 
     FileObserver observer =
             new FileObserver(android.os.Environment.getExternalStorageDirectory().toString()
@@ -168,4 +112,29 @@ public class FileViewerFragment extends Fragment implements MoPubView.BannerAdLi
                     }
                 }
             };
+
+    @Override
+    public void onAdLoaded() {
+        if (getContext() != null && isResumed()) {
+            mBannerView.setVisibility(View.VISIBLE);
+        }
+    }
+
+    @Override
+    public void onAdLoadFailed(Throwable throwable) {
+        Log.e(LOG_TAG, throwable.toString());
+    }
+
+    @Override
+    public void onAdImpression() {
+        Log.d(LOG_TAG, "onAdImpression");
+    }
+
+    @Override
+    public void onAdClick() {
+        Log.d(LOG_TAG, "onAdClicked");
+        if (getContext() != null && isResumed()) {
+            mBannerView.setVisibility(View.GONE);
+        }
+    }
 }
